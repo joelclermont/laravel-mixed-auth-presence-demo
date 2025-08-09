@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\PresenceDemoController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',  fn() => auth()->check() ? 'Logged in' : 'Logged out');
 
-Route::get('/presence-demo', [PresenceDemoController::class, 'index']);
+Route::get('/presence-demo', function () {
+    return view('presence-demo', ['user' => auth('broadcast-guest')->user()]);
+});
 
 Route::get('/login', function () {
     $user = User::firstOrCreate(

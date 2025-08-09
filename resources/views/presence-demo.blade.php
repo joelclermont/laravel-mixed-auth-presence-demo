@@ -14,14 +14,14 @@
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <p class="flex items-center gap-2">
                 <span class="font-semibold">You are:</span>
-                <span>{{ $currentUser['name'] }}</span>
-                @if($currentUser['type'] === 'authenticated')
-                    <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded">User</span>
-                @else
+                <span>{{ $user->name }}</span>
+                @if($user->getAttribute('is_guest'))
                     <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-gray-600 rounded">Guest</span>
+                @else
+                    <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded">User</span>
                 @endif
             </p>
-            @if($currentUser['type'] === 'guest')
+            @if($user->getAttribute('is_guest'))
                 <p class="mt-2 text-gray-600">
                     <a href="/login" class="text-blue-600 hover:underline">Login</a> to appear as an authenticated user
                 </p>
@@ -44,8 +44,8 @@
                     <template x-for="user in users" :key="user.id">
                         <div class="flex items-center justify-between p-3 mb-2 rounded-lg transition"
                              :class="user.type === 'authenticated' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'">
-                            <span x-text="user.name + (user.id == {{ $currentUser['id'] }} ? ' (You)' : '')"
-                                  :class="user.id == {{ $currentUser['id'] }} ? 'font-bold' : ''"></span>
+                            <span x-text="user.name + (user.id == {{ $user->id }} ? ' (You)' : '')"
+                                  :class="user.id == {{ $user->id }} ? 'font-bold' : ''"></span>
                             <span class="px-2 py-1 text-xs font-bold rounded"
                                   :class="user.type === 'authenticated' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white'"
                                   x-text="user.type === 'authenticated' ? 'User' : 'Guest'"></span>
