@@ -19,7 +19,9 @@ class IdentifyGuest
         }
 
         if (! $request->session()->has('guest_id')) {
-            $request->session()->put('guest_id', 'guest_' . Str::random(16));
+            // Generate a unique integer ID starting with 999
+            $guestId = 999000000 + random_int(1, 999999);
+            $request->session()->put('guest_id', $guestId);
             $request->session()->put('guest_name', 'Guest ' . random_int(1000, 9999));
         }
 

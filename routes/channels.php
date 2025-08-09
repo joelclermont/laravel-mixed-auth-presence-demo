@@ -6,25 +6,16 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('mixed-auth-presence-demo', function ($user = null) {
-    if ($user) {
-        return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'type' => 'authenticated',
-        ];
+Broadcast::channel('mixed-auth-presence-demo', function ($user) {
+    if (! $user) {
+        return false;
     }
     
-    $guestId = request()->session()->get('guest_id');
-    $guestName = request()->session()->get('guest_name');
+    $isGuest = $user->getAttribute('is_guest') ?? false;
     
-    if ($guestId) {
-        return [
-            'id' => $guestId,
-            'name' => $guestName,
-            'type' => 'guest',
-        ];
-    }
-    
-    return false;
-});
+    return [
+        'id' => $user->id,
+        'name' => $user->name,
+        'type' => $isGuest ? 'guest' : 'authenticated',
+    ];
+}, ['guards' => ['broadcast-guest']]);
