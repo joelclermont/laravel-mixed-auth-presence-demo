@@ -10,12 +10,12 @@ Broadcast::channel('mixed-auth-presence-demo', function ($user) {
     if (! $user) {
         return false;
     }
-    
+
     $isGuest = $user->getAttribute('is_guest') ?? false;
-    
+
     return [
         'id' => $user->id,
         'name' => $user->name,
         'type' => $isGuest ? 'guest' : 'authenticated',
     ];
-}, ['guards' => ['broadcast-guest']]);
+}, ['guards' => ['broadcast-guest']]); // this custom guard is what gets us a "User" whether they are authenticated or not

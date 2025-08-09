@@ -6,11 +6,15 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class IdentifyGuest
 {
+    /**
+     * This is just a proof of concept to show you might identify unauthenticated users
+     * in a stable way, based on session data. In a real application, you would likely
+     * need something more robust to prevent collisions and handle any security implications.
+     */
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {

@@ -12,6 +12,7 @@ Route::get('/presence-demo', function () {
     return view('presence-demo', ['user' => auth('broadcast-guest')->user()]);
 });
 
+// Some dummy routes to easily simulate logging in and out for the demo
 Route::get('/login', function () {
     $user = User::firstOrCreate(
         ['email' => 'demo@example.com'],
@@ -20,15 +21,15 @@ Route::get('/login', function () {
             'password' => bcrypt('password'),
         ]
     );
-    
+
     Auth::login($user);
-    
+
     return redirect('/presence-demo');
 });
 
 Route::post('/logout', function () {
     Auth::logout();
-    
+
     return redirect('/presence-demo');
 });
 
