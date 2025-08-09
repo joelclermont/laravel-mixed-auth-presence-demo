@@ -6,132 +6,77 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Mixed Auth Presence Channel Demo</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        .user-list {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 1rem;
-            min-height: 300px;
-        }
-        .user-item {
-            padding: 0.5rem;
-            margin: 0.25rem 0;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .user-item.authenticated {
-            background-color: #e0f2fe;
-            border: 1px solid #0284c7;
-        }
-        .user-item.guest {
-            background-color: #f3f4f6;
-            border: 1px solid #9ca3af;
-        }
-        .user-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .badge-authenticated {
-            background-color: #0284c7;
-            color: white;
-        }
-        .badge-guest {
-            background-color: #6b7280;
-            color: white;
-        }
-        .current-user {
-            font-weight: bold;
-        }
-        .notification {
-            padding: 0.5rem 1rem;
-            margin: 0.5rem 0;
-            border-radius: 4px;
-            animation: slideIn 0.3s ease-out;
-        }
-        .notification.join {
-            background-color: #d1fae5;
-            border: 1px solid #10b981;
-        }
-        .notification.leave {
-            background-color: #fee2e2;
-            border: 1px solid #ef4444;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div x-data="presenceChannel()" style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
-        <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">Mixed Auth Presence Channel Demo</h1>
+<body class="bg-gray-50">
+    <div x-data="presenceChannel()" class="max-w-4xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Mixed Auth Presence Channel Demo</h1>
 
-        <div style="background-color: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <p><strong>You are:</strong>
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <p class="flex items-center gap-2">
+                <span class="font-semibold">You are:</span>
                 <span>{{ $currentUser['name'] }}</span>
-                <span class="user-badge badge-{{ $currentUser['type'] }}">{{ ucfirst($currentUser['type']) }}</span>
+                @if($currentUser['type'] === 'authenticated')
+                    <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded">User</span>
+                @else
+                    <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-gray-600 rounded">Guest</span>
+                @endif
             </p>
             @if($currentUser['type'] === 'guest')
-                <p style="margin-top: 0.5rem; color: #6b7280;">
-                    <a href="/login" style="color: #0284c7; text-decoration: underline;">Login</a> to appear as an authenticated user
+                <p class="mt-2 text-gray-600">
+                    <a href="/login" class="text-blue-600 hover:underline">Login</a> to appear as an authenticated user
                 </p>
             @else
-                <form method="POST" action="/logout" style="margin-top: 0.5rem;">
+                <form method="POST" action="/logout" class="mt-2">
                     @csrf
-                    <button type="submit" style="background-color: #ef4444; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; border: none; cursor: pointer;">
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
                         Logout
                     </button>
                 </form>
             @endif
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="grid md:grid-cols-2 gap-6">
             <div>
-                <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;">
+                <h2 class="text-xl font-bold mb-3">
                     Active Users (<span x-text="users.length"></span>)
                 </h2>
-                <div class="user-list">
+                <div class="bg-white rounded-lg shadow p-4 min-h-[300px]">
                     <template x-for="user in users" :key="user.id">
-                        <div :class="'user-item ' + user.type">
-                            <span x-text="user.name + (user.id === '{{ $currentUser['id'] }}' ? ' (You)' : '')" :class="user.id === '{{ $currentUser['id'] }}' ? 'current-user' : ''"></span>
-                            <span :class="'user-badge badge-' + user.type" x-text="user.type === 'authenticated' ? 'User' : 'Guest'"></span>
+                        <div class="flex items-center justify-between p-3 mb-2 rounded-lg transition"
+                             :class="user.type === 'authenticated' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'">
+                            <span x-text="user.name + (user.id == {{ $currentUser['id'] }} ? ' (You)' : '')"
+                                  :class="user.id == {{ $currentUser['id'] }} ? 'font-bold' : ''"></span>
+                            <span class="px-2 py-1 text-xs font-bold rounded"
+                                  :class="user.type === 'authenticated' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white'"
+                                  x-text="user.type === 'authenticated' ? 'User' : 'Guest'"></span>
                         </div>
                     </template>
-                    <div x-show="users.length === 0" style="color: #9ca3af; text-align: center; margin-top: 2rem;">
+                    <div x-show="users.length === 0" class="text-gray-400 text-center mt-8">
                         Connecting to channel...
                     </div>
                 </div>
             </div>
 
             <div>
-                <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;">Activity Log</h2>
-                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; min-height: 300px; max-height: 300px; overflow-y: auto;">
+                <h2 class="text-xl font-bold mb-3">Activity Log</h2>
+                <div class="bg-white rounded-lg shadow p-4 min-h-[300px] max-h-[300px] overflow-y-auto">
                     <template x-for="(notification, index) in notifications" :key="index">
-                        <div :class="'notification ' + notification.type">
+                        <div class="p-3 mb-2 rounded-lg"
+                             :class="notification.type === 'join' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
                             <span x-text="notification.message"></span>
-                            <span style="color: #6b7280; font-size: 0.875rem; margin-left: 0.5rem;" x-text="notification.time"></span>
+                            <span class="text-gray-500 text-sm ml-2" x-text="notification.time"></span>
                         </div>
                     </template>
-                    <div x-show="notifications.length === 0" style="color: #9ca3af; text-align: center; margin-top: 2rem;">
+                    <div x-show="notifications.length === 0" class="text-gray-400 text-center mt-8">
                         Waiting for activity...
                     </div>
                 </div>
             </div>
         </div>
 
-        <div style="margin-top: 2rem; padding: 1rem; background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px;">
-            <h3 style="font-weight: bold; margin-bottom: 0.5rem;">How to test:</h3>
-            <ol style="list-style: decimal; margin-left: 1.5rem;">
+        <div class="mt-8 p-6 bg-amber-50 border border-amber-200 rounded-lg">
+            <h3 class="font-bold mb-3">How to test:</h3>
+            <ol class="list-decimal list-inside space-y-1 text-gray-700">
                 <li>Open this page in multiple browser tabs/windows or incognito mode</li>
                 <li>Watch as users join and leave the presence channel</li>
                 <li>Try logging in/out to see how user types change</li>
